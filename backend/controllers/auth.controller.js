@@ -87,5 +87,16 @@ export async function login(req, res) {
 }
 
 export function logout(req, res) {
-  res.send("logout");
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    res
+      .status(200)
+      .json({ status: "success", message: "loogged out succesfully" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      status: "fail",
+      message: "Internal Server Error!",
+    });
+  }
 }
