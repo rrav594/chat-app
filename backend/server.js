@@ -1,14 +1,22 @@
-import express from "express";
 import dotenv from "dotenv";
 
+import mongoose from "mongoose";
+
+import express from "express";
+import authroute from "./routes/auth.route.js";
+
 const app = express();
-dotenv.config();
+dotenv.config({ path: "../config.env" });
 
-app.get("/", (req, res) => {
-  res.send("hello from ravi ranjan -----");
-});
+app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("Server started...");
+app.use("/api/auth", authroute);
+
+mongoose
+  .connect(process.env.DB)
+  .then(console.log("Database connected successfully...."));
+
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+  console.log(`Server started...on port ${port}`);
 });
