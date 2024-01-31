@@ -1,6 +1,6 @@
 import bcryptjs from "bcryptjs";
 import User from "../models/user.model.js";
-import jwt from "jsonwebtoken";
+import { generateTokenAndSetCookie } from "../utils/generateToken.js";
 
 export async function signup(req, res) {
   try {
@@ -29,27 +29,18 @@ export async function signup(req, res) {
     });
     if (newUser) {
       await newUser.save();
-      const token = jwt.sign({ newUser }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
+      generateTokenAndSetCookie(newUser._id, res);
 
-      res
-        .status(201)
-        .cookie("jwt", token, {
-          maxAge: 15 * 24 * 60 * 60 * 1000,
-          httpOnly: true,
-          sameSite: "strict",
-        })
-        .json({
-          status: "success",
-          data: {
-            firstname: newUser.firstname,
-            lastname: newUser.lastname,
-            username: newUser.username,
-            gender: newUser.gender,
-            profilePic: newUser.profilePic,
-          },
-        });
+      res.json({
+        status: "success",
+        data: {
+          firstname: newUser.firstname,
+          lastname: newUser.lastname,
+          username: newUser.username,
+          gender: newUser.gender,
+          profilePic: newUser.profilePic,
+        },
+      });
     } else {
       res.staus(400).json({ status: "fail", error: "Invalid user data." });
     }
@@ -62,8 +53,37 @@ export async function signup(req, res) {
   }
 }
 
-export function login(req, res) {
-  res.send("login");
+export async function login(req, res) {
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+    const isPasswordCorrect = await bcryptjs.compare(
+      password,
+      user?.password || ""
+    );
+
+    if (!user || !isPasswordCorrect) {
+      return res.status(400).json({ error: "Invalid credentials." });
+    }
+
+    generateTokenAndSetCookie(user._id, res);
+    res.status(200).json({
+      status: "success",
+      data: {
+        id: user._id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        username: user.username,
+        profilepic: user.profilePic,
+      },
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      status: "fail",
+      message: "Internal Server Error!",
+    });
+  }
 }
 
 export function logout(req, res) {
