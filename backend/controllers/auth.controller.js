@@ -1,5 +1,6 @@
 import bcryptjs from "bcryptjs";
 import User from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 
 export async function signup(req, res) {
   try {
@@ -7,7 +8,7 @@ export async function signup(req, res) {
       req.body;
     if (password !== confirmPassword) {
       return res.status(400).json({
-        error: "Password and conform password do not match.",
+        error: "Password and confirm password do not match.",
       });
     }
     const user = await User.findOne({ username });
@@ -28,17 +29,27 @@ export async function signup(req, res) {
     });
     if (newUser) {
       await newUser.save();
-
-      res.status(201).json({
-        status: "success",
-        data: {
-          firstname: newUser.firstname,
-          lastname: newUser.lastname,
-          username: newUser.username,
-          gender: newUser.gender,
-          profilePic: newUser.profilePic,
-        },
+      const token = jwt.sign({ newUser }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
       });
+
+      res
+        .status(201)
+        .cookie("jwt", token, {
+          maxAge: 15 * 24 * 60 * 60 * 1000,
+          httpOnly: true,
+          sameSite: "strict",
+        })
+        .json({
+          status: "success",
+          data: {
+            firstname: newUser.firstname,
+            lastname: newUser.lastname,
+            username: newUser.username,
+            gender: newUser.gender,
+            profilePic: newUser.profilePic,
+          },
+        });
     } else {
       res.staus(400).json({ status: "fail", error: "Invalid user data." });
     }
