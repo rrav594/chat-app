@@ -2,7 +2,6 @@
   "type": "module",
   "name": "chat-app",
   "version": "1.0.0",
-  "description": "",
   "main": "server.js",
   "scripts": {
     "server": "node backend/server.js"
@@ -21,5 +20,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.3"
-  }
+  },
+  "description": ""
 }
