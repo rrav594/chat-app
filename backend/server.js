@@ -1,16 +1,21 @@
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
 import mongoose from "mongoose";
 
 import express from "express";
-import authroute from "./routes/auth.route.js";
+
+import authRoute from "./routes/auth.route.js";
+import messageRoute from "./routes/message.route.js";
 
 const app = express();
 dotenv.config({ path: "../config.env" });
 
 app.use(express.json());
+app.use(cookieParser());
 
-app.use("/api/auth", authroute);
+app.use("/api/auth", authRoute);
+app.use("/api/message", messageRoute);
 
 mongoose
   .connect(process.env.DB)
