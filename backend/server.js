@@ -10,7 +10,7 @@ import messageRoute from "./routes/message.route.js";
 import userRoute from "./routes/user.route.js";
 
 const app = express();
-dotenv.config({ path: "../config.env" });
+dotenv.config({ path: "./config.env" });
 
 app.use(express.json());
 app.use(cookieParser());
