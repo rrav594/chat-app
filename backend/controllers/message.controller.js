@@ -26,6 +26,7 @@ export const sendMessage = async (req, res) => {
     if (newMessage) {
       conversation.messages.push(newMessage._id);
     }
+    // Socket IO functionality will be added here
     // await conversation.save();
     // await newMessage.save();
 
