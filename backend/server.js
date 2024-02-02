@@ -7,6 +7,7 @@ import express from "express";
 
 import authRoute from "./routes/auth.route.js";
 import messageRoute from "./routes/message.route.js";
+import userRoute from "./routes/user.route.js";
 
 const app = express();
 dotenv.config({ path: "../config.env" });
@@ -16,6 +17,8 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoute);
 app.use("/api/message", messageRoute);
+
+app.use("/api/users", userRoute);
 
 mongoose
   .connect(process.env.DB)
